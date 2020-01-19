@@ -15,7 +15,7 @@ public interface WorkerRepository extends JpaRepository <Worker, Integer >  {
 
     boolean existsByContactPhone1(String Phone);
     boolean existsByFatherWorkerId(Integer id);
-    @Query(value = "select * from Worker WHERE w.contact_phone1 = ?1 LIMIT 1", nativeQuery = true)
+    @Query(value = "select * from Worker w WHERE w.contact_phone1 = ?1 LIMIT 1", nativeQuery = true)
     Optional<Worker> findByContactPhone1(String phone);
     List<Worker> findAllByFatherWorkerIdNotNull();
     Worker findByFatherWorkerId(Integer WorkerId);
