@@ -7,6 +7,8 @@ import com.bramix.entities.*;
 import com.bramix.repos.ClientRepository;
 import com.bramix.repos.PetsRepository;
 import com.bramix.repos.WorkerRepository;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

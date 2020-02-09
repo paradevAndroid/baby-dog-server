@@ -55,10 +55,10 @@ public class Worker extends Account {
     @OneToMany(mappedBy = "worker", cascade = CascadeType.ALL)
     private Set<Review> reviews;
 
-     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+     //@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
      @OneToMany (mappedBy = "workerFullBusy", cascade = CascadeType.ALL)
      private Set<Schedule> listFullyBusy ;
-     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+     //@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
      @OneToMany (mappedBy = "workerNotFullBusy", cascade = CascadeType.ALL)
      private Set<Schedule> listPartiallyOccupied;
 

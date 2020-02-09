@@ -38,7 +38,7 @@ public class SmsService {
         //test.verificate@gmail.com"
         MailSender.sendFromGMail("test.verificate@gmail.com", "paradev8", to ,phone.toString(), text + code);
         promoCodeRepository.deleteByPhone(phone);
-        promoCodeRepository.save (promoCode);
+        promoCodeRepository.save(promoCode);
         return new Answer(true);
     }
     public Answer ValidateCode (String phone, String code){

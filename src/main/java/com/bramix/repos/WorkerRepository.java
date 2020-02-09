@@ -5,6 +5,7 @@ import com.bramix.entities.Worker;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -14,9 +15,15 @@ import java.util.Optional;
 public interface WorkerRepository extends JpaRepository <Worker, Integer >  {
 
     boolean existsByContactPhone1(String Phone);
+
     boolean existsByFatherWorkerId(Integer id);
-    @Query(value = "select * from Worker WHERE contact_phone1 = ?1 LIMIT 1", nativeQuery = true)
+
+    @Query(value = "select * from Worker w WHERE w.contact_phone1 = ?1 LIMIT 1", nativeQuery = true)
     Optional<Worker> findByContactPhone1(String phone);
+
+//    @Query("select w from Worker w WHERE w.contactPhone1 = ?1")
+//    Optional<Worker> findByContactPhone1(String phone);
+
     List<Worker> findAllByFatherWorkerIdNotNull();
     Worker findByFatherWorkerId(Integer WorkerId);
 
@@ -26,7 +33,7 @@ public interface WorkerRepository extends JpaRepository <Worker, Integer >  {
             " and (w.hasChildrens = :hasChildrens or :hasChildrens is null) " +
             " and (a.privateHouse =:privateHouse or :privateHouse is null) and (w.isDogHandler = :isDogHandler or :isDogHandler is null )" +
             " and (w.canGiveMedicine = :canGiveMedicine or :canGiveMedicine is null ) and (:price is null or w.price <= :price )" +
-            " and (:sizeOfDog is null or w.sizeOfDog >= :sizeOfDog ) and (:countOfPets is null or w.countOfPets <= :countOfPets ) " )
+            " and (:sizeOfDog is null or w.sizeOfDog <= :sizeOfDog ) and (:countOfPets is null or w.countOfPets >= :countOfPets ) " )
     List <Worker> findTest (@RequestParam String district, String city, String street, Boolean hasChildrens, Boolean privateHouse,
                             Boolean isDogHandler, Boolean canGiveMedicine, Integer price, Integer sizeOfDog, Integer countOfPets );
 

@@ -8,7 +8,7 @@ public class Filter {
     public String district;
     public String street;
     public Boolean privateHouse;
-    public Boolean hasChildrens ;
+    public Boolean hasChildren;
     public Boolean isDogHandler ;
     public Boolean canMakeInjection ;
     public Boolean canGiveMedicine ;

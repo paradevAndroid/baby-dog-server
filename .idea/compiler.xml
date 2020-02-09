@@ -9,6 +9,7 @@
         <module name="babydog-server" />
         <module name="IdeaProjects" />
         <module name="doges" />
+        <module name="baby-dog-server" />
         <module name="doge" />
       </profile>
     </annotationProcessing>
@@ -16,6 +17,7 @@
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="IdeaProjects" options="-parameters" />
+      <module name="baby-dog-server" options="-parameters" />
       <module name="babydog-server" options="-parameters" />
       <module name="doge" options="-parameters" />
       <module name="doges" options="-parameters" />

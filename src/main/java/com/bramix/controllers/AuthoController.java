@@ -118,10 +118,10 @@ public class AuthoController {
 
                 else{
                     Worker worker = userService.getWorkerRepository().findByContactPhone1(number).get();
-                    RegistrationEntity registationEntity = new RegistrationEntity();
-                    registationEntity.setWorker(worker);
-                    registationEntity.setAddress(worker.getAddress());
-                    return new Answer(true, registationEntity, "Worker's info");
+                    RegistrationEntity registrationEntity = new RegistrationEntity();
+                    registrationEntity.setWorker(worker);
+                    registrationEntity.setAddress(worker.getAddress());
+                    return new Answer(true, registrationEntity, "Worker's info");
                 }
 
             }

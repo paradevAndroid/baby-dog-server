@@ -14,9 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -60,7 +58,7 @@ public class StatusController {
 
     @PostMapping ("/update")
     public Answer updateWithoutCheck (HttpSession httpSession, @RequestBody Worker worker) {
-        log.info("Atrribute names of session = {}", httpSession.getAttributeNames());
+        log.info(httpSession.getAttribute(Properties.id.getProperty()) + "");
         String id = (String) httpSession.getAttribute(Properties.id.getProperty());
         if (id == null) {
             return new Answer(false, "Not permitted");
@@ -98,23 +96,69 @@ public class StatusController {
         if (filter.price == null || filter.price == 0)
             filter.price = null;
 
-        List <Worker> workers =  workerRepository.findTest(filter.district, filter.city, filter.street, filter.hasChildrens,
-                filter.privateHouse, filter.isDogHandler, filter.canGiveMedicine, filter.price, filter.sizeOfDog, filter.countOfPets);
-        List <FilterDate> result = workers.stream()
-                    .filter(worker -> !Optional.ofNullable(filter.listFullyBusy).isPresent() ||
-                            (filter.listFullyBusy.stream().anyMatch(calendar -> !worker.getListFullyBusy().contains(calendar)
-                                     && !worker.getListPartiallyOccupied().contains(calendar))))
-                    .map(worker -> { return new FilterDate(worker.getFirstName(), worker.getLastName(), worker.getPhoto_mini(),
-                            worker.getPrice_period(), worker.getPrice(), worker.getAddress().getCity(), worker.getAddress().getStreet(),
-                            worker.getAddress().getDistrict(), worker.getAverageRating(), worker.getRepeatingOrders(), worker.getId());})
-                    .collect(Collectors.toList());
+        if(filter == null)
+            return new Answer (false, "filter is null");
 
+        if (!filter.isDogHandler) filter.isDogHandler = null;
+        if (!filter.canGiveMedicine) filter.canGiveMedicine = null;
+        if (!filter.canMakeInjection) filter.canMakeInjection = null;
+        if (filter.hasChildren) filter.hasChildren = null;
+
+        List <Worker> workers =  workerRepository.findTest(filter.district, filter.city, filter.street, filter.hasChildren,
+                filter.privateHouse, filter.isDogHandler, filter.canGiveMedicine, filter.price, filter.sizeOfDog, filter.countOfPets);
+        List<FilterDate> result = new ArrayList<>();
+        boolean breakLoop = false;
+        if (filter.listFullyBusy != null && !filter.listFullyBusy.isEmpty()) {
+            for (Worker worker : workers) {
+                Set<Schedule> listFullyBusy = worker.getListFullyBusy();
+                for (Schedule schedule : listFullyBusy) {
+                    if (breakLoop) {
+                        breakLoop = false;
+                        break;
+                    }
+                    for (Schedule scheduleF : filter.listFullyBusy) {
+                        if (isSchedulesEqual(schedule, scheduleF)) {
+                            result.add(formFilterItem(worker));
+                            breakLoop = true;
+                            break;
+                        }
+                    }
+                }
+            }
+        }else {
+            for (Worker worker: workers) {
+                result.add(formFilterItem(worker));
+            }
+        }
+        log.info("Size = " + result.size());
+//        List <FilterDate> result = workers.stream()
+//                    .filter(worker -> !Optional.ofNullable(filter.listFullyBusy).isPresent() ||
+//                            (filter.listFullyBusy.stream().anyMatch(calendar -> !worker.getListFullyBusy().contains(calendar)
+//                                     && !worker.getListPartiallyOccupied().contains(calendar))))
+//                    .map(worker -> { return new FilterDate(worker.getFirstName(), worker.getLastName(), worker.getPhoto_mini(),
+//                            worker.getPrice_period(), worker.getPrice(), worker.getAddress().getCity(), worker.getAddress().getStreet(),
+//                            worker.getAddress().getDistrict(), worker.getAverageRating(), worker.getRepeatingOrders(), worker.getId());})
+//                    .collect(Collectors.toList());
         if (result.size() < begin + 1)
                 return new Answer (false, "Begin value is more then count of Workers");
         if (result.size() < begin + size  )
                  return new Answer (true, result.subList(begin, result.size() ));
 
         return new Answer(true, result);
+    }
+
+    private FilterDate formFilterItem(Worker worker){
+        return new FilterDate(worker.getFirstName(), worker.getLastName(),
+                worker.getPhoto_mini(), worker.getPrice_period(), worker.getPrice(), worker.getAddress().getCity(),
+                worker.getAddress().getCity(), worker.getAddress().getDistrict(), worker.getAverageRating(),
+                worker.getRepeatingOrders(),worker.getId());
+    }
+
+    private boolean isSchedulesEqual(Schedule schedule1, Schedule schedule2){
+        if (schedule1.getYear().equals(schedule2.getYear()) &&
+            schedule1.getMonth().equals(schedule2.getMonth()) &&
+            schedule1.getDayOfMonth().equals(schedule2.getDayOfMonth())) return true;
+        else return false;
     }
 
     @Data
@@ -131,7 +175,9 @@ public class StatusController {
         private int repeatingOrders;
         private int id;
 
-        public FilterDate(String firstName, String lastName, String photo_mini, int price_period, int price, String city, String street, String district, Double averageRating, int repeatingOrders, int id) {
+        public FilterDate(String firstName, String lastName, String photo_mini, int price_period,
+                          int price, String city, String street, String district,
+                          Double averageRating, int repeatingOrders, int id) {
             this.firstName = firstName;
             this.lastName = lastName;
             this.photo_mini = photo_mini;
